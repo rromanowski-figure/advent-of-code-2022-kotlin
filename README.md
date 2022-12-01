@@ -1,9 +1,10 @@
 # Advent of Code 2022
-## Brought to you by @rromanowski-figure via Kotlin
+_Brought to you by [rromanowski-figure][github] with Kotlin_
 
-Welcome to the Advent of Code[^aoc] Kotlin project created by [rromanowski-figure][github] using the [Advent of Code Kotlin Template][template] delivered by JetBrains.
+## Welcome
+Welcome to the *Advent of Code[^aoc] 2022* Kotlin project created by [rromanowski-figure][github] using the [Advent of Code Kotlin Template][template] delivered by JetBrains.
 
-In this repository, rromanowski-figure is about to provide solutions for the puzzles using [Kotlin][kotlin] language.
+In this repository, I will provide solutions for the puzzles using [Kotlin][kotlin] language.
 
 If you're stuck with Kotlin-specific questions or anything related to this template, check out the following resources:
 
