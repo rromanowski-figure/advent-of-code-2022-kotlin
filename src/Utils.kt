@@ -3,9 +3,20 @@ import java.math.BigInteger
 import java.security.MessageDigest
 
 /**
- * Reads lines from the given input txt file.
+ * Convert day (1) to padded string (01)
  */
-fun readInput(name: String) = File("src/resources", name)
+fun Int.dayString(): String = toString().padStart(2, '0')
+
+/**
+ * Reads lines from the given input file.
+ */
+fun readInput(name: Int) = File("src/resources", "input-${name.dayString()}")
+    .readLines()
+
+/**
+ * Reads lines from the given sample input file.
+ */
+fun readSampleInput(name: Int) = File("src/resources", "input-${name.dayString()}-sample")
     .readLines()
 
 /**
