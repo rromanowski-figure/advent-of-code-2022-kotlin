@@ -4,23 +4,25 @@ import kotlin.math.min
 
 object Day09 : Runner<Int>(9, 13, 36) {
     override fun part1(input: List<String>): Int {
-        val grid = Grid()
+        val grid = Grid(2)
 
         input.forEach {
             val move = Move(it)
-            grid.moveHead(move)
+            grid.moveRope(move)
         }
 
         return grid.tailVisited.size
     }
 
     override fun part2(input: List<String>): Int {
+        val grid = Grid(10)
+
         input.forEach {
             val move = Move(it)
-            println(move)
+            grid.moveRope(move)
         }
 
-        return 0
+        return grid.tailVisited.size
     }
 
     class Move private constructor(
@@ -53,31 +55,43 @@ object Day09 : Runner<Int>(9, 13, 36) {
         }
     }
 
-    class Grid {
+    class Rope(val knots: MutableList<Point>) {
+        val head get() = knots.first()
+        val tail get() = knots.last()
+        val size get() = knots.size
+
+        fun update(i: Int, p: Point) {
+            knots[i] = p
+        }
+    }
+    class Grid(val ropeSize: Int) {
         val tailVisited: MutableSet<Point> = mutableSetOf(Point(0, 0))
         private val headVisited: MutableSet<Point> = mutableSetOf(Point(0, 0))
 
-        var head = Point(0, 0)
-        var tail = Point(0, 0)
+        private val rope = Rope(MutableList(ropeSize) { Point(0, 0) })
 
-        fun moveHead(move: Move) {
+        fun moveRope(move: Move) {
             val newHead = when (move.direction) {
-                Direction.LEFT -> Point(head.x - move.steps, head.y)
-                Direction.RIGHT -> Point(head.x + move.steps, head.y)
-                Direction.UP -> Point(head.x, head.y - move.steps)
-                Direction.DOWN -> Point(head.x, head.y + move.steps)
+                Direction.LEFT -> Point(rope.head.x - move.steps, rope.head.y)
+                Direction.RIGHT -> Point(rope.head.x + move.steps, rope.head.y)
+                Direction.UP -> Point(rope.head.x, rope.head.y - move.steps)
+                Direction.DOWN -> Point(rope.head.x, rope.head.y + move.steps)
             }
 
-            val headPositions = head.connectingLine(newHead)
+            val headPositions = rope.head.connectingLine(newHead)
 
             headPositions.forEach {
                 // Move head, add to list
-                head = it
-                headVisited.add(head)
+                rope.update(0, it)
+                headVisited.add(rope.head)
 
-                // Move tail, add to list
-                tail = tail.moveNear(head)
-                tailVisited.add(tail)
+                for (i in 1 until ropeSize) {
+                    // Move piece
+                    rope.update(i, rope.knots[i].moveNear(rope.knots[i - 1]))
+                }
+
+                // Add tail to list
+                tailVisited.add(rope.tail)
 
                 // Print grid
                 // println(this).also { Thread.sleep(200) }
@@ -99,11 +113,15 @@ object Day09 : Runner<Int>(9, 13, 36) {
             // draw s
             grid[-minY][-minX] = 's'
 
+            for (p in rope.knots.asReversed()) {
+                grid[p.y - minY][p.x - minX] = '*'
+            }
+
             // draw T
-            grid[tail.y - minY][tail.x - minX] = 'T'
+            grid[rope.tail.y - minY][rope.tail.x - minX] = 'T'
 
             // draw H
-            grid[head.y - minY][head.x - minX] = 'H'
+            grid[rope.head.y - minY][rope.head.x - minX] = 'H'
 
             return grid.joinToString("\n", "\n") {
                 it.joinToString("") { c -> c.toString() }

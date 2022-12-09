@@ -1,4 +1,4 @@
-sealed class Runner<T>(private val day: Int, private val check1: T, private val check2: T) {
+sealed class Runner<T>(val day: Int, private val check1: T, private val check2: T) {
     abstract fun part1(input: List<String>): T
     abstract fun part2(input: List<String>): T
 
@@ -9,7 +9,7 @@ sealed class Runner<T>(private val day: Int, private val check1: T, private val 
         }
 
         val input = readInput(day)
-        println("Part 1: ${part1(input)}")
+        // println("Part 1: ${part1(input)}")
 
         val sampleOutput2 = part2(readSampleInput(day, 2))
         check(sampleOutput2 == check2) {
@@ -20,9 +20,19 @@ sealed class Runner<T>(private val day: Int, private val check1: T, private val 
     }
     companion object {
         fun of(day: Int): Runner<*> {
-            val className = "Day${day.dayString()}"
+            val runners: Map<Int, Runner<*>> = listOf(
+                Day01,
+                Day02,
+                Day03,
+                Day04,
+                Day05,
+                Day06,
+                Day07,
+                Day08,
+                Day09,
+            ).associateBy { it.day }
 
-            return Class.forName(className).kotlin.objectInstance as Runner<*>
+            return runners[day] ?: error("No runner for day $day")
         }
     }
 }
