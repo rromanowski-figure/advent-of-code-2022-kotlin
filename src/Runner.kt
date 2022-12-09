@@ -3,8 +3,7 @@ sealed class Runner<T>(private val day: Int, private val check1: T, private val 
     abstract fun part2(input: List<String>): T
 
     fun run() {
-        val sampleInput = readSampleInput(day)
-        val sampleOutput1 = part1(sampleInput)
+        val sampleOutput1 = part1(readSampleInput(day, 1))
         check(sampleOutput1 == check1) {
             "Sample input for part 1 is wrong. Expected: $check1, Actual: $sampleOutput1"
         }
@@ -12,7 +11,7 @@ sealed class Runner<T>(private val day: Int, private val check1: T, private val 
         val input = readInput(day)
         println("Part 1: ${part1(input)}")
 
-        val sampleOutput2 = part2(sampleInput)
+        val sampleOutput2 = part2(readSampleInput(day, 2))
         check(sampleOutput2 == check2) {
             "Sample input for part 2 is wrong. Expected: $check2, Actual: $sampleOutput2"
         }

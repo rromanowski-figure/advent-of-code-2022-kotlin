@@ -16,8 +16,13 @@ fun readInput(name: Int) = File("src/resources", "input-${name.dayString()}")
 /**
  * Reads lines from the given sample input file.
  */
-fun readSampleInput(name: Int) = File("src/resources", "input-${name.dayString()}-sample")
-    .readLines()
+fun readSampleInput(name: Int, part: Int): List<String> {
+    return (
+        File("src/resources", "input-${name.dayString()}.$part-sample").takeIf { it.exists() }
+            ?: File("src/resources", "input-${name.dayString()}-sample")
+        )
+        .readLines()
+}
 
 /**
  * Converts string to md5 hash.
