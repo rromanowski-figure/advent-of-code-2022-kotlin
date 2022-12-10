@@ -1,4 +1,4 @@
-object Day07 : Runner<Int>(7, 95437, 24933642) {
+object Day07 : Runner<Int, Int>(7, 95437, 24933642) {
     override fun part1(input: List<String>): Int {
         val fs = Directory(null, "")
 

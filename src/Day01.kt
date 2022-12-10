@@ -1,4 +1,4 @@
-object Day01 : Runner<Int>(1, 24000, 45000) {
+object Day01 : Runner<Int, Int>(1, 24000, 45000) {
     override fun part1(input: List<String>): Int = toCalorieMap(input).values.maxOf { it.sum() }
 
     override fun part2(input: List<String>): Int {

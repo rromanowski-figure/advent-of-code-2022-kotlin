@@ -1,4 +1,4 @@
-object Day02 : Runner<Int>(2, 15, 12) {
+object Day02 : Runner<Int, Int>(2, 15, 12) {
     override fun part1(input: List<String>): Int {
         val results = input.map {
             val values = it.split(" ")

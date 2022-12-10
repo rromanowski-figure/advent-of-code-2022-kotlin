@@ -1,4 +1,4 @@
-object Day08 : Runner<Int>(8, 21, 8) {
+object Day08 : Runner<Int, Int>(8, 21, 8) {
     override fun part1(input: List<String>): Int {
         val height = input.size
         val treePatch = TreePatch(List(height) { input[it].toCharArray().map { c -> Tree(c.digitToInt()) } })

@@ -1,4 +1,4 @@
-object Day05 : Runner<String>(5, "CMZ", "MCD") {
+object Day05 : Runner<String, String>(5, "CMZ", "MCD") {
     override fun part1(input: List<String>): String {
         val (stacks, instructions) = parseInput(input)
 

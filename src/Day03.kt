@@ -1,4 +1,4 @@
-object Day03 : Runner<Int>(3, 157, 70) {
+object Day03 : Runner<Int, Int>(3, 157, 70) {
     override fun part1(input: List<String>): Int {
         val priorities = input.map { contents ->
             val half = contents.length / 2

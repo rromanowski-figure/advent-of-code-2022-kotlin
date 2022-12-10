@@ -2,7 +2,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-object Day09 : Runner<Int>(9, 13, 36) {
+object Day09 : Runner<Int, Int>(9, 13, 36) {
     override fun part1(input: List<String>): Int {
         val grid = Grid(2)
 
@@ -67,8 +67,15 @@ object Day09 : Runner<Int>(9, 13, 36) {
     class Grid(val ropeSize: Int) {
         val tailVisited: MutableSet<Point> = mutableSetOf(Point(0, 0))
         private val headVisited: MutableSet<Point> = mutableSetOf(Point(0, 0))
-
         private val rope = Rope(MutableList(ropeSize) { Point(0, 0) })
+
+        val minX get() = min(tailVisited.minOf { it.x }, headVisited.minOf { it.x })
+        val minY get() = min(tailVisited.minOf { it.y }, headVisited.minOf { it.y })
+        val maxX get() = max(tailVisited.maxOf { it.x }, headVisited.maxOf { it.x })
+        val maxY get() = max(tailVisited.maxOf { it.y }, headVisited.maxOf { it.y })
+
+        val height get() = maxY - minY + 1
+        val width get() = maxX - minX + 1
 
         fun moveRope(move: Move) {
             val newHead = when (move.direction) {
@@ -94,20 +101,11 @@ object Day09 : Runner<Int>(9, 13, 36) {
                 tailVisited.add(rope.tail)
 
                 // Print grid
-                // println(this).also { Thread.sleep(200) }
+                println(this).also { Thread.sleep(20) }
             }
         }
 
         override fun toString(): String {
-            // Get min and max x,y
-            val minX = min(tailVisited.minOf { it.x }, headVisited.minOf { it.x })
-            val minY = min(tailVisited.minOf { it.y }, headVisited.minOf { it.y })
-            val maxX = max(tailVisited.maxOf { it.x }, headVisited.maxOf { it.x })
-            val maxY = max(tailVisited.maxOf { it.y }, headVisited.maxOf { it.y })
-
-            val height = maxY - minY + 1
-            val width = maxX - minX + 1
-
             val grid = List(height) { MutableList(width) { '⋅' } }
 
             // draw s

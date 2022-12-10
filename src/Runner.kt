@@ -1,6 +1,6 @@
-sealed class Runner<T>(val day: Int, private val check1: T, private val check2: T) {
+sealed class Runner<T, V>(val day: Int, private val check1: T, private val check2: V) {
     abstract fun part1(input: List<String>): T
-    abstract fun part2(input: List<String>): T
+    abstract fun part2(input: List<String>): V
 
     fun run() {
         val sampleOutput1 = part1(readSampleInput(day, 1))
@@ -9,18 +9,18 @@ sealed class Runner<T>(val day: Int, private val check1: T, private val check2: 
         }
 
         val input = readInput(day)
-        // println("Part 1: ${part1(input)}")
+        println("Part 1:\n${part1(input)}")
 
         val sampleOutput2 = part2(readSampleInput(day, 2))
         check(sampleOutput2 == check2) {
             "Sample input for part 2 is wrong. Expected: $check2, Actual: $sampleOutput2"
         }
 
-        println("Part 2: ${part2(input)}")
+        println("Part 2:\n${part2(input)}")
     }
     companion object {
-        fun of(day: Int): Runner<*> {
-            val runners: Map<Int, Runner<*>> = listOf(
+        fun of(day: Int): Runner<*, *> {
+            val runners: Map<Int, Runner<*, *>> = listOf(
                 Day01,
                 Day02,
                 Day03,
@@ -30,6 +30,7 @@ sealed class Runner<T>(val day: Int, private val check1: T, private val check2: 
                 Day07,
                 Day08,
                 Day09,
+                Day10,
             ).associateBy { it.day }
 
             return runners[day] ?: error("No runner for day $day")
