@@ -1,4 +1,4 @@
-object Day11 : Runner<Long, Long>(11, 10605, -1) {
+object Day11 : Runner<Long, Long>(11, 10605L, 2713310158L) {
 
     private fun String.toItems(): List<Item> = split(",").map { Item(it.trim().toLong()) }
 
@@ -11,19 +11,19 @@ object Day11 : Runner<Long, Long>(11, 10605, -1) {
         val ifFalse = """\s+If false: throw to monkey (\d+)""".toRegex()
     }
 
-    override fun part1(input: List<String>): Long {
-        val monkeyMap = mutableMapOf<Long, Monkey>()
-        var currentMonkey = monkey { }
+    private fun monkeyMap(input: List<String>, factor: Long = 3): MutableMap<Int, Monkey> {
+        val monkeyMap = mutableMapOf<Int, Monkey>()
+        var currentMonkey = monkey { worryDecreaseFactor { factor } }
 
         input.forEach {
             if (it.trim().isBlank()) {
                 val monkey = currentMonkey.finalize()
                 monkeyMap[monkey.id] = monkey
-                currentMonkey = monkey { }
+                currentMonkey = monkey { worryDecreaseFactor { factor } }
             }
 
             Regex.monkey.find(it)?.destructured?.also {
-                currentMonkey.apply { id { it.component1().toLong() } }
+                currentMonkey.apply { id { it.component1().toInt() } }
             }
 
             Regex.itemList.find(it)?.destructured?.also {
@@ -43,11 +43,11 @@ object Day11 : Runner<Long, Long>(11, 10605, -1) {
             }
 
             Regex.ifTrue.find(it)?.destructured?.also {
-                currentMonkey.apply { onTrueTarget { it.component1().toLong() } }
+                currentMonkey.apply { onTrueTarget { it.component1().toInt() } }
             }
 
             Regex.ifFalse.find(it)?.destructured?.also {
-                currentMonkey.apply { onFalseTarget { it.component1().toLong() } }
+                currentMonkey.apply { onFalseTarget { it.component1().toInt() } }
             }
         }
 
@@ -56,27 +56,57 @@ object Day11 : Runner<Long, Long>(11, 10605, -1) {
 
         println(monkeyMap.values.joinToString("\n") { "${it.id} ${it.items}" })
 
-        repeat(20) {
-            monkeyMap.entries.sortedBy { it.key }.forEach { (_, monkey) ->
+        return monkeyMap
+    }
+
+    private fun MutableMap<Int, Monkey>.inspect(rounds: Int = 20) {
+        val supermodulo = this.values.fold(1L) { a, m ->
+            a * m.divisibleBy
+        }
+
+        repeat(rounds) { r ->
+            this.entries.sortedBy { it.key }.forEach { (_, monkey) ->
                 while (monkey.items.isNotEmpty()) {
                     val item = monkey.items.removeFirst()
-                    monkey.throwItem(item, monkeyMap[monkey.inspect(item)]!!)
+                    monkey.throwItem(item, this[monkey.inspect(item, supermodulo)]!!)
+                }
+            }
+
+            val round = r + 1
+            if (rounds > 20 && (round == 1 || round == 20 || round % 1000 == 0)) {
+                println("\n== After round $round ==")
+                this.values.forEach { monkey ->
+                    println("Monkey ${monkey.id} inspected items ${monkey.numberOfInspections} times.")
                 }
             }
         }
 
-        monkeyMap.values.forEach {
+        this.values.forEach {
             println("Monkey ${it.id} inspected items ${it.numberOfInspections} times.")
         }
+    }
 
-        return monkeyMap.values
+    private fun Map<Int, Monkey>.monkeyBusiness(): Long {
+        return this.values
             .sortedByDescending { it.numberOfInspections }
             .take(2)
             .fold(1) { a, m -> a * m.numberOfInspections }
     }
 
+    override fun part1(input: List<String>): Long {
+        val monkeyMap = monkeyMap(input)
+
+        monkeyMap.inspect()
+
+        return monkeyMap.monkeyBusiness()
+    }
+
     override fun part2(input: List<String>): Long {
-        TODO("Not yet implemented")
+        val monkeyMap = monkeyMap(input, 1)
+
+        monkeyMap.inspect(10000)
+
+        return monkeyMap.monkeyBusiness()
     }
 
     data class Item(var worryLevel: Long) {
@@ -85,19 +115,20 @@ object Day11 : Runner<Long, Long>(11, 10605, -1) {
         }
     }
     data class Monkey(
-        val id: Long,
+        val id: Int,
         val items: MutableList<Item>,
         val operation: Long.() -> Long,
+        val worryDecreaseFactor: Long,
         val divisibleBy: Long,
-        val onTrueTarget: Long,
-        val onFalseTarget: Long,
-        var numberOfInspections: Long = 0,
+        val onTrueTarget: Int,
+        val onFalseTarget: Int,
+        var numberOfInspections: Long = 0L,
     ) {
-        fun inspect(item: Item): Long {
+        fun inspect(item: Item, modulo: Long): Int {
             numberOfInspections++
 
-            item.worryLevel = item.worryLevel.operation()
-            item.worryLevel /= 3
+            item.worryLevel = item.worryLevel.operation() % modulo
+            item.worryLevel /= worryDecreaseFactor
 
             return if (item.worryLevel % divisibleBy == 0L) onTrueTarget
             else onFalseTarget
@@ -109,20 +140,30 @@ object Day11 : Runner<Long, Long>(11, 10605, -1) {
     }
 
     class MonkeyBuilder(
-        private var id: Long = -1,
+        private var id: Int = -1,
         private var items: MutableList<Item> = mutableListOf(),
         private var operation: Long.() -> Long = { this },
+        private var worryDecreaseFactor: Long = 3,
         private var divisibleBy: Long = 0,
-        private var onTrueTarget: Long = -1,
-        private var onFalseTarget: Long = -1,
+        private var onTrueTarget: Int = -1,
+        private var onFalseTarget: Int = -1,
     ) {
-        fun id(lambda: () -> Long) { this.id = lambda() }
+        fun id(lambda: () -> Int) { this.id = lambda() }
+        fun worryDecreaseFactor(lambda: () -> Long) { this.worryDecreaseFactor = lambda() }
         fun items(lambda: () -> List<Item>) { this.items = lambda().toMutableList() }
         fun operation(lambda: () -> Long.() -> Long) { this.operation = lambda() }
         fun divisibleBy(lambda: () -> Long) { this.divisibleBy = lambda() }
-        fun onTrueTarget(lambda: () -> Long) { this.onTrueTarget = lambda() }
-        fun onFalseTarget(lambda: () -> Long) { this.onFalseTarget = lambda() }
-        fun finalize() = Monkey(id, items, operation, divisibleBy, onTrueTarget, onFalseTarget)
+        fun onTrueTarget(lambda: () -> Int) { this.onTrueTarget = lambda() }
+        fun onFalseTarget(lambda: () -> Int) { this.onFalseTarget = lambda() }
+        fun finalize() = Monkey(
+            id = id,
+            items = items,
+            operation = operation,
+            worryDecreaseFactor = worryDecreaseFactor,
+            divisibleBy = divisibleBy,
+            onTrueTarget = onTrueTarget,
+            onFalseTarget = onFalseTarget
+        )
     }
 
     private fun monkey(lambda: MonkeyBuilder.() -> Unit): MonkeyBuilder {
