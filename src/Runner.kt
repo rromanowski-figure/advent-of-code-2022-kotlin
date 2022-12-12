@@ -31,6 +31,8 @@ sealed class Runner<T, V>(val day: Int, private val check1: T, private val check
                 Day08,
                 Day09,
                 Day10,
+                Day11,
+                Day12,
             ).associateBy { it.day }
 
             return runners[day] ?: error("No runner for day $day")
